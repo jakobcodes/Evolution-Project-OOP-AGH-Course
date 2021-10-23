@@ -9,13 +9,13 @@ public class World {
         System.out.println("System wystartowal");
 
         String[] arguments = {"f", "f", "l", "c", "b", "c"};
-        List<Direction> directions = convertInstructions(arguments);
+        List<MoveDirection> directions = convertInstructions(arguments);
         run(directions);
 
         System.out.println("System zakonczyl działanie");
     }
 
-    public static void run(List<Direction> directions) {
+    public static void run(List<MoveDirection> directions) {
         System.out.println("Start");
 
         directions
@@ -31,7 +31,7 @@ public class World {
         System.out.println("Stop");
     }
 
-    public static List<Direction> convertInstructions(String[] moves) {
+    public static List<MoveDirection> convertInstructions(String[] moves) {
 
         Stream<String> directionsStream = Stream.of(moves);
         List<String> directionList = directionsStream
@@ -40,13 +40,11 @@ public class World {
 
         return directionList
                 .stream()
-                .map(x -> {
-                    return switch (x) {
-                        case "f" -> Direction.FORWARD;
-                        case "b" -> Direction.BACKWARD;
-                        case "r" -> Direction.RIGHT;
-                        default -> Direction.LEFT;
-                    };
+                .map(x -> switch (x) {
+                    case "f" -> MoveDirection.FORWARD;
+                    case "b" -> MoveDirection.BACKWARD;
+                    case "r" -> MoveDirection.RIGHT;
+                    case "l" -> MoveDirection.LEFT;
                 })
                 .toList();
     }
