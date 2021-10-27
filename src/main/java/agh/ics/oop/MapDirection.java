@@ -6,20 +6,12 @@ public enum MapDirection {
     EAST,
     WEST;
 
-    public static void main(String[] args) {
-        MapDirection polnoc = NORTH;
-        System.out.println(polnoc);
-        System.out.println(polnoc.next());
-        System.out.println(polnoc.previous());
-        System.out.println(polnoc.toUnitVector());
-    }
-
     public String toString(){
         return switch (this) {
-            case NORTH -> "Północ";
-            case SOUTH -> "Południe";
-            case EAST -> "Wschód";
-            case WEST -> "Zachód";
+            case NORTH -> "Polnoc";
+            case SOUTH -> "Poludnie";
+            case EAST -> "Wschod";
+            case WEST -> "Zachod";
         };
     }
 

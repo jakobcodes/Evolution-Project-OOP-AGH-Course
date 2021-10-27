@@ -6,13 +6,15 @@ import java.util.stream.Stream;
 
 public class World {
     public static void main(String[] args) {
-        System.out.println("System wystartowal");
 
-        String[] arguments = {"f", "f", "l", "c", "b", "c"};
-        List<MoveDirection> directions = convertInstructions(arguments);
-        run(directions);
-
-        System.out.println("System zakonczyl działanie");
+        Animal animal = new Animal();
+        System.out.println(animal);
+        OptionsParser parser = new OptionsParser();
+        List<MoveDirection> moveDirections = parser.parse(args);
+        for(MoveDirection moveDirection: moveDirections){
+            animal.move(moveDirection);
+        }
+        System.out.println(animal);
     }
 
     public static void run(List<MoveDirection> directions) {
@@ -44,7 +46,7 @@ public class World {
                     case "f" -> MoveDirection.FORWARD;
                     case "b" -> MoveDirection.BACKWARD;
                     case "r" -> MoveDirection.RIGHT;
-                    case "l" -> MoveDirection.LEFT;
+                    default -> MoveDirection.LEFT;
                 })
                 .toList();
     }
