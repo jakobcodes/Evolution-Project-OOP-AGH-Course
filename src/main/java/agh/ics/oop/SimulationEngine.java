@@ -21,9 +21,9 @@ public class SimulationEngine implements IEngine{
 
     @Override
     public void run() {
-        List<Animal> animals = new ArrayList<Animal>();
+        List<Animal> animals = new ArrayList<>();
         for (Vector2d pos : initialPositions){
-            if (map.objectAt(pos) != null){
+            if (map.objectAt(pos) instanceof Animal){
                 animals.add((Animal) map.objectAt(pos));
             }
         }
