@@ -5,6 +5,8 @@ public class Animal {
 
     private Vector2d position;
 
+    private IWorldMap map;
+
     public Animal(MapDirection orientation, Vector2d vector2d) {
         this.orientation = orientation;
         this.position = vector2d;
@@ -14,6 +16,24 @@ public class Animal {
         this.orientation = MapDirection.NORTH;
         this.position = new Vector2d(2,2);
     }
+
+    public Animal(IWorldMap map){
+        this.orientation = MapDirection.NORTH;
+        this.position = new Vector2d(2,2);
+        this.map = map;
+    }
+
+    public Animal(IWorldMap map, Vector2d initialPosition){
+        this.orientation = MapDirection.NORTH;
+        this.position = initialPosition;
+        this.map = map;
+    }
+    public Animal(IWorldMap map, Vector2d initialPosition, MapDirection direction){
+        this.orientation = direction;
+        this.position = initialPosition;
+        this.map = map;
+    }
+
 
     public MapDirection getOrientation() {
         return orientation;
@@ -25,14 +45,7 @@ public class Animal {
 
     @Override
     public String toString() {
-        return "Animal{" +
-                "orientation=" + orientation +
-                ", position=" + position +
-                '}';
-    }
-
-    public boolean isInside(int x, int y){
-        return (x >= 0 && y >= 0 && x <= 4 && y <= 4);
+        return orientation.toString();
     }
 
     public void move(MoveDirection direction){
@@ -45,13 +58,13 @@ public class Animal {
             }
             case FORWARD -> {
                 Vector2d new_location = this.position.add(this.orientation.toUnitVector());
-                if (isInside(new_location.x, new_location.y)){
+                if (map.canMoveTo(new_location)){
                     this.position = new_location;
                 }
             }
             case BACKWARD -> {
                 Vector2d new_location = this.position.subtract(this.orientation.toUnitVector());
-                if (isInside(new_location.x, new_location.y)){
+                if (map.canMoveTo(new_location)){
                     this.position = new_location;
                 }
             }

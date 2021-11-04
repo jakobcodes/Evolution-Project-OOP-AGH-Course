@@ -26,22 +26,22 @@ class AnimalTest {
         assertEquals(res4, animal4.toString());
     }
 
-    @Test
-    void isInside() {
-        assertTrue(animal1.isInside(0,0));
-        assertTrue(animal1.isInside(1,1));
-        assertTrue(animal1.isInside(2,2));
-        assertTrue(animal1.isInside(4,2));
-        assertTrue(animal1.isInside(1,3));
-        assertTrue(animal1.isInside(2,4));
-
-        assertFalse(animal1.isInside(-1,0));
-        assertFalse(animal1.isInside(-2,2));
-        assertFalse(animal1.isInside(5,5));
-        assertFalse(animal1.isInside(1000,1));
-        assertFalse(animal1.isInside(-1000,2));
-        assertFalse(animal1.isInside(42,0));
-    }
+//    @Test
+//    void isInside() {
+//        assertTrue(animal1.isInside(0,0));
+//        assertTrue(animal1.isInside(1,1));
+//        assertTrue(animal1.isInside(2,2));
+//        assertTrue(animal1.isInside(4,2));
+//        assertTrue(animal1.isInside(1,3));
+//        assertTrue(animal1.isInside(2,4));
+//
+//        assertFalse(animal1.isInside(-1,0));
+//        assertFalse(animal1.isInside(-2,2));
+//        assertFalse(animal1.isInside(5,5));
+//        assertFalse(animal1.isInside(1000,1));
+//        assertFalse(animal1.isInside(-1000,2));
+//        assertFalse(animal1.isInside(42,0));
+//    }
 
     @Test
     void orientationTest() {

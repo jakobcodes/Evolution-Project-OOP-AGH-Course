@@ -7,14 +7,11 @@ import java.util.stream.Stream;
 public class World {
     public static void main(String[] args) {
 
-        Animal animal = new Animal();
-        System.out.println(animal);
-        OptionsParser parser = new OptionsParser();
-        List<MoveDirection> moveDirections = parser.parse(args);
-        for(MoveDirection moveDirection: moveDirections){
-            animal.move(moveDirection);
-        }
-        System.out.println(animal);
+        List<MoveDirection> directions = new OptionsParser().parse(args);
+        IWorldMap map = new RectangularMap(10, 5);
+        Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4) };
+        IEngine engine = new SimulationEngine(directions, map, positions);
+        engine.run();
     }
 
     public static void run(List<MoveDirection> directions) {
