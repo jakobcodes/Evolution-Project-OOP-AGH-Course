@@ -5,9 +5,9 @@ import java.util.List;
 
 public class SimulationEngine implements IEngine{
 
-    private List<MoveDirection> moves;
-    private IWorldMap map;
-    private Vector2d[] initialPositions;
+    private final List<MoveDirection> moves;
+    private final IWorldMap map;
+    private final Vector2d[] initialPositions;
 
     public SimulationEngine(List<MoveDirection> moves, IWorldMap map, Vector2d[] initialPositions) {
         this.moves = moves;
@@ -29,9 +29,12 @@ public class SimulationEngine implements IEngine{
         }
         int numberOfAnimals = animals.size();
         int i = 0;
+        System.out.println(map);
         for (MoveDirection move: moves){
             animals.get(i%numberOfAnimals).move(move);
             i++;
+            System.out.println(map);
         }
+
     }
 }

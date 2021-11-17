@@ -26,9 +26,8 @@ class RectangularMapTest {
         assertTrue(map.canMoveTo(new Vector2d(3,2)));
         assertTrue(map.canMoveTo(new Vector2d(2,3)));
         assertTrue(map.canMoveTo(new Vector2d(4,4)));
-        assertTrue(map.canMoveTo(new Vector2d(3,5)));
         assertTrue(map.canMoveTo(new Vector2d(0,0)));
-        assertTrue(map.canMoveTo(new Vector2d(10,5)));
+        assertTrue(map.canMoveTo(new Vector2d(9,4)));
     }
 
     @Test
@@ -43,7 +42,7 @@ class RectangularMapTest {
         assertTrue(map.place(new Animal(map, new Vector2d(1,1))));
         assertTrue(map.place(new Animal(map, new Vector2d(3,3))));
         assertTrue(map.place(new Animal(map, new Vector2d(4,4))));
-        assertTrue(map.place(new Animal(map, new Vector2d(10,5))));
+        assertTrue(map.place(new Animal(map, new Vector2d(9,4))));
         assertTrue(map.place(new Animal(map, new Vector2d(0,0))));
         assertTrue(map.place(new Animal(map, new Vector2d(4,2))));
     }
