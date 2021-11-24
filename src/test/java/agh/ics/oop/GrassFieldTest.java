@@ -22,21 +22,6 @@ class GrassFieldTest {
     private Vector2d rightTop;
 
     @Test
-    void placeGrass() {
-        List<Vector2d> grassPositions = new ArrayList<>();
-        Vector2d leftBottomGrassCorner = new Vector2d(0,0);
-        Vector2d rightTopGrassCorner = new Vector2d(map.getGrassBorder(), map.getGrassBorder());
-
-        for (Grass grass: map.getGrasses()){
-            assertFalse(grassPositions.contains(grass.getPosition()));
-            assertTrue(grass.getPosition().follows(leftBottomGrassCorner));
-            assertTrue(grass.getPosition().precedes(rightTopGrassCorner));
-            grassPositions.add(grass.getPosition());
-        }
-        assertEquals(map.getGrassQuantity(), grassPositions.size());
-    }
-
-    @Test
     void canMoveTo() {
         assertFalse(map.canMoveTo(new Vector2d(2,2)));
         assertFalse(map.canMoveTo(new Vector2d(3,4)));
@@ -77,39 +62,32 @@ class GrassFieldTest {
 
     @Test
     void checkMapBorders() {
-        for (Grass grass: map.getGrasses()){
-            leftBottom = leftBottom.lowerLeft(grass.getPosition());
-            rightTop = rightTop.upperRight(grass.getPosition());
-        }
-
-        assertEquals(leftBottom, map.leftBottomCorner);
-        assertEquals(rightTop, map.rightTopCorner);
 
         map.place(new Animal(map,new Vector2d(1000,1000)));
-        assertEquals(new Vector2d(1000,1000), map.rightTopCorner);
+        assertEquals(new Vector2d(1000,1000), map.getRightTopCorner());
 
         map.place(new Animal(map,new Vector2d(-1000,-1000)));
-        assertEquals(new Vector2d(-1000,-1000), map.leftBottomCorner);
+        assertEquals(new Vector2d(-1000,-1000), map.getLeftBottomCorner());
 
         map.place(animalRight);
-        assertEquals(new Vector2d(1001,1000), map.rightTopCorner);
+        assertEquals(new Vector2d(1001,1000), map.getRightTopCorner());
         animalRight.move(MoveDirection.FORWARD);
-        assertEquals(new Vector2d(1002,1000), map.rightTopCorner);
+        assertEquals(new Vector2d(1002,1000), map.getRightTopCorner());
 
         map.place(animalTop);
-        assertEquals(new Vector2d(1002,1001), map.rightTopCorner);
+        assertEquals(new Vector2d(1002,1001), map.getRightTopCorner());
         animalTop.move(MoveDirection.FORWARD);
-        assertEquals(new Vector2d(1002,1002), map.rightTopCorner);
+        assertEquals(new Vector2d(1002,1002), map.getRightTopCorner());
 
         map.place(animalLeft);
-        assertEquals(new Vector2d(-1001,-1000), map.leftBottomCorner);
+        assertEquals(new Vector2d(-1001,-1000), map.getLeftBottomCorner());
         animalLeft.move(MoveDirection.FORWARD);
-        assertEquals(new Vector2d(-1002,-1000), map.leftBottomCorner);
+        assertEquals(new Vector2d(-1002,-1000), map.getLeftBottomCorner());
 
         map.place(animalBottom);
-        assertEquals(new Vector2d(-1002,-1001), map.leftBottomCorner);
+        assertEquals(new Vector2d(-1002,-1001), map.getLeftBottomCorner());
         animalBottom.move(MoveDirection.FORWARD);
-        assertEquals(new Vector2d(-1002,-1002), map.leftBottomCorner);
+        assertEquals(new Vector2d(-1002,-1002), map.getLeftBottomCorner());
     }
 
     @BeforeEach

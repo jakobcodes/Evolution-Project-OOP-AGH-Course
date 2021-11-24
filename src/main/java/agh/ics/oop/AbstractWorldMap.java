@@ -1,13 +1,12 @@
 package agh.ics.oop;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-abstract public class AbstractWorldMap implements IWorldMap{
-    protected List<Animal> animals = new ArrayList<>();
-
-    protected Vector2d leftBottomCorner;
-    protected Vector2d rightTopCorner;
+abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObserver{
+//    protected List<Animal> animals = new ArrayList<>();
+    protected Map<Vector2d,Animal> animals = new LinkedHashMap<>();
 
     @Override
     public boolean canMoveTo(Vector2d position) {
@@ -17,7 +16,7 @@ abstract public class AbstractWorldMap implements IWorldMap{
     @Override
     public boolean place(Animal animal) {
         if (canMoveTo(animal.getPosition())){
-            animals.add(animal);
+            animals.put(animal.getPosition(), animal);
             return true;
         }
         return false;
@@ -25,26 +24,22 @@ abstract public class AbstractWorldMap implements IWorldMap{
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        for (Animal animal: animals){
-            if (animal.getPosition().equals(position)){
-                return true;
-            }
-        }
-        return false;
+        return animals.containsKey(position);
     }
 
     @Override
     public Object objectAt(Vector2d position) {
-        if (isOccupied(position)){
-            for (Animal animal: animals){
-                if (animal.getPosition().equals(position)) return animal;
-            }
-        }
-        return null;
+        return animals.get(position);
     }
 
     @Override
     public String toString() {
-        return new MapVisualizer(this).draw(leftBottomCorner, rightTopCorner);
+        return new MapVisualizer(this).draw(new Vector2d(0,0), new Vector2d(10,10));
+    }
+
+    @Override
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        animals.put(newPosition,animals.get(oldPosition));
+        animals.remove(oldPosition);
     }
 }

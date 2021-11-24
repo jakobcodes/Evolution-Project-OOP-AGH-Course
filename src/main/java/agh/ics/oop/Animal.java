@@ -1,11 +1,13 @@
 package agh.ics.oop;
 
-public class Animal {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Animal{
     private MapDirection orientation;
-
     private Vector2d position;
-
     private IWorldMap map;
+    private List<IPositionChangeObserver> observers = new ArrayList<>();
 
     public Animal(MapDirection orientation, Vector2d vector2d) {
         this.orientation = orientation;
@@ -34,18 +36,22 @@ public class Animal {
         this.map = map;
     }
 
-
-    public MapDirection getOrientation() {
-        return orientation;
-    }
+    public MapDirection getOrientation() { return orientation; }
 
     public Vector2d getPosition() {
         return position;
     }
 
-    @Override
-    public String toString() {
-        return orientation.toString();
+    public void addObserver(IPositionChangeObserver observer){
+        observers.add(observer);
+    }
+
+    public void removeObserver(IPositionChangeObserver observer){
+        observers.remove(observer);
+    }
+
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition){
+        observers.forEach(e -> e.positionChanged(oldPosition,newPosition));
     }
 
     public void move(MoveDirection direction){
@@ -59,16 +65,21 @@ public class Animal {
             case FORWARD -> {
                 Vector2d new_location = this.position.add(this.orientation.toUnitVector());
                 if (map.canMoveTo(new_location)){
+                    positionChanged(this.position, new_location);
                     this.position = new_location;
                 }
             }
             case BACKWARD -> {
                 Vector2d new_location = this.position.subtract(this.orientation.toUnitVector());
                 if (map.canMoveTo(new_location)){
+                    positionChanged(this.position, new_location);
                     this.position = new_location;
                 }
             }
         }
     }
-
+    @Override
+    public String toString() {
+        return orientation.toString();
+    }
 }

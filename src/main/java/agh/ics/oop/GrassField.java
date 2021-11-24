@@ -1,17 +1,16 @@
 package agh.ics.oop;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class GrassField extends AbstractWorldMap{
 
-    private Integer grassQuantity;
-    private Integer grassBorder;
-    private List<Grass> grasses;
+    private final Integer grassQuantity;
+    private final Integer grassBorder;
+    private final Map<Vector2d,Grass> grasses;
 
     public GrassField(Integer grassQuantity) {
         this.grassQuantity = grassQuantity;
-        this.grasses = new ArrayList<Grass>();
+        this.grasses = new HashMap<>();
         this.grassBorder = (int) Math.floor(Math.sqrt(grassQuantity*10));
 
         while (grassQuantity > 0){
@@ -27,10 +26,7 @@ public class GrassField extends AbstractWorldMap{
         Vector2d grassPos = new Vector2d(randomX, randomY);
         if (!isOccupied(grassPos)){
             if (!(objectAt(grassPos) instanceof Grass)){
-                grasses.add(new Grass(grassPos));
-                if (this.leftBottomCorner == null) this.leftBottomCorner = new Vector2d(grassPos.x, grassPos.y);
-                if (this.rightTopCorner == null) this.rightTopCorner = new Vector2d(grassPos.x, grassPos.y);
-                checkMapBorders(grassPos);
+                grasses.put(grassPos,new Grass(grassPos));
                 return true;
             }
         }
@@ -40,7 +36,6 @@ public class GrassField extends AbstractWorldMap{
     @Override
     public boolean canMoveTo(Vector2d position) {
         if (super.canMoveTo(position)){
-            checkMapBorders(position);
             return true;
         }
         return (objectAt(position) instanceof Grass);
@@ -49,7 +44,7 @@ public class GrassField extends AbstractWorldMap{
     @Override
     public boolean place(Animal animal) {
         if (super.place(animal)){
-            checkMapBorders(animal.getPosition());
+            animal.addObserver(this);
             return true;
         }
         return false;
@@ -58,39 +53,73 @@ public class GrassField extends AbstractWorldMap{
     @Override
     public boolean isOccupied(Vector2d position) {
         if (super.isOccupied(position)) return true;
-        for (Grass grass: grasses){
-            if (grass.getPosition().equals(position)){
-                return true;
-            }
-        }
-        return false;
+        return grasses.containsKey(position);
     }
 
     @Override
     public Object objectAt(Vector2d position) {
         if (super.objectAt(position) != null) return super.objectAt(position);
-        if(isOccupied(position)){
-            for (Grass grass: grasses){
-                if (grass.getPosition().equals(position)) return grass;
+        return grasses.get(position);
+    }
+
+    public Vector2d getLeftBottomCorner(){
+        Vector2d minXAnimal = animals.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o1.x - o2.x;
             }
-        }
-        return null;
+        }).get();
+        Vector2d minYAnimal = animals.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o1.y - o2.y;
+            }
+        }).get();
+        Vector2d minXGrass = grasses.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o1.x - o2.x;
+            }
+        }).get();
+        Vector2d minYGrass = grasses.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o1.y - o2.y;
+            }
+        }).get();
+
+        return minXAnimal.lowerLeft(minYAnimal).lowerLeft(minXGrass).lowerLeft(minYGrass);
+    }
+    public Vector2d getRightTopCorner(){
+        Vector2d maxXAnimal = animals.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o2.x - o1.x;
+            }
+        }).get();
+        Vector2d maxYAnimal = animals.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o2.y - o1.y;
+            }
+        }).get();
+        Vector2d maxXGrass = grasses.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o2.x - o1.x;
+            }
+        }).get();
+        Vector2d maxYGrass = grasses.keySet().stream().min(new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d o1, Vector2d o2) {
+                return o2.y - o1.y;
+            }
+        }).get();
+        return maxXAnimal.upperRight(maxYAnimal).upperRight(maxXGrass).upperRight(maxYGrass);
     }
 
-    public void checkMapBorders(Vector2d pos){
-        this.leftBottomCorner = this.leftBottomCorner.lowerLeft(pos);
-        this.rightTopCorner = this.rightTopCorner.upperRight(pos);
-    }
-
-    public List<Grass> getGrasses() {
-        return grasses;
-    }
-
-    public Integer getGrassQuantity() {
-        return grassQuantity;
-    }
-
-    public Integer getGrassBorder() {
-        return grassBorder;
+    @Override
+    public String toString() {
+        return new MapVisualizer(this).draw(getLeftBottomCorner(), getRightTopCorner());
     }
 }
