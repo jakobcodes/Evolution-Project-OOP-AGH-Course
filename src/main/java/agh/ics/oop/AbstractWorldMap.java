@@ -6,7 +6,7 @@ import java.util.List;
 abstract public class AbstractWorldMap implements IWorldMap{
     protected List<Animal> animals = new ArrayList<>();
 
-    protected Vector2d leftBottomCorner;
+    protected Vector2d leftBottomCorner;    // te pola w klasach potomnych mają trochę różne znaczenie, więc może nie powinny być tu zdefiniowane?
     protected Vector2d rightTopCorner;
 
     @Override
@@ -45,6 +45,6 @@ abstract public class AbstractWorldMap implements IWorldMap{
 
     @Override
     public String toString() {
-        return new MapVisualizer(this).draw(leftBottomCorner, rightTopCorner);
-    }
+        return new MapVisualizer(this).draw(leftBottomCorner, rightTopCorner);  // nowy obiekt co wywołanie
+    }   // a skąd pewność, że rogi są aktualne?
 }

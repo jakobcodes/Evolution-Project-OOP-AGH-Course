@@ -7,12 +7,12 @@ public class Animal {
 
     private IWorldMap map;
 
-    public Animal(MapDirection orientation, Vector2d vector2d) {
+    public Animal(MapDirection orientation, Vector2d vector2d) {    // ten konstruktor nie ma prawa bytu
         this.orientation = orientation;
         this.position = vector2d;
     }
 
-    public Animal(){
+    public Animal(){// ten konstruktor nie ma prawa bytu
         this.orientation = MapDirection.NORTH;
         this.position = new Vector2d(2,2);
     }

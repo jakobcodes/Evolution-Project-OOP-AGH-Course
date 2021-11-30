@@ -68,7 +68,7 @@ public class GrassField extends AbstractWorldMap{
 
     @Override
     public Object objectAt(Vector2d position) {
-        if (super.objectAt(position) != null) return super.objectAt(position);
+        if (super.objectAt(position) != null) return super.objectAt(position);  // podwójne wywołanie, a ta metoda jest akurat dość kosztowna
         if(isOccupied(position)){
             for (Grass grass: grasses){
                 if (grass.getPosition().equals(position)) return grass;
@@ -77,12 +77,12 @@ public class GrassField extends AbstractWorldMap{
         return null;
     }
 
-    public void checkMapBorders(Vector2d pos){
+    public void checkMapBorders(Vector2d pos){  // czemu public?
         this.leftBottomCorner = this.leftBottomCorner.lowerLeft(pos);
         this.rightTopCorner = this.rightTopCorner.upperRight(pos);
     }
 
-    public List<Grass> getGrasses() {
+    public List<Grass> getGrasses() {   // ten getter nie ma prawa bytu
         return grasses;
     }
 

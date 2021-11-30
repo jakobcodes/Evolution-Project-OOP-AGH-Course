@@ -6,7 +6,7 @@ public class Grass {
         return "*";
     }
 
-    private Vector2d position;
+    private Vector2d position;  // to pole może być finalne
 
     public Grass(Vector2d position) {
         this.position = position;
