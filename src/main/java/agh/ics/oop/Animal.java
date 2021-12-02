@@ -9,22 +9,6 @@ public class Animal{
     private IWorldMap map;
     private List<IPositionChangeObserver> observers = new ArrayList<>();
 
-    public Animal(MapDirection orientation, Vector2d vector2d) {
-        this.orientation = orientation;
-        this.position = vector2d;
-    }
-
-    public Animal(){
-        this.orientation = MapDirection.NORTH;
-        this.position = new Vector2d(2,2);
-    }
-
-    public Animal(IWorldMap map){
-        this.orientation = MapDirection.NORTH;
-        this.position = new Vector2d(2,2);
-        this.map = map;
-    }
-
     public Animal(IWorldMap map, Vector2d initialPosition){
         this.orientation = MapDirection.NORTH;
         this.position = initialPosition;
@@ -65,15 +49,17 @@ public class Animal{
             case FORWARD -> {
                 Vector2d new_location = this.position.add(this.orientation.toUnitVector());
                 if (map.canMoveTo(new_location)){
-                    positionChanged(this.position, new_location);
+                    Vector2d old_location = this.position;
                     this.position = new_location;
+                    positionChanged(old_location, new_location);
                 }
             }
             case BACKWARD -> {
                 Vector2d new_location = this.position.subtract(this.orientation.toUnitVector());
                 if (map.canMoveTo(new_location)){
-                    positionChanged(this.position, new_location);
+                    Vector2d old_location = this.position;
                     this.position = new_location;
+                    positionChanged(old_location, new_location);
                 }
             }
         }

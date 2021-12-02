@@ -16,8 +16,13 @@ public class RectangularMap extends AbstractWorldMap{
     }
 
     @Override
-    public String toString() {
-        return new MapVisualizer(this).draw(leftBottomCorner, rightTopCorner);
+    public Vector2d getLeftBottomCorner() {
+        return leftBottomCorner;
+    }
+
+    @Override
+    public Vector2d getRightTopCorner() {
+        return rightTopCorner;
     }
 
     public boolean isInMap(Vector2d position){

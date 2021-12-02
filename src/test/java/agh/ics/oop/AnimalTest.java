@@ -18,13 +18,7 @@ class AnimalTest {
     private String res3;
     private String res4;
 
-    @Test
-    void testToString() {
-        assertEquals(res1, animal1.toString());
-        assertEquals(res2, animal2.toString());
-        assertEquals(res3, animal3.toString());
-        assertEquals(res4, animal4.toString());
-    }
+    private IWorldMap map;
 
 //    @Test
 //    void isInside() {
@@ -148,12 +142,14 @@ class AnimalTest {
 
     @BeforeEach
     void setUp() {
-        animal22North = new Animal(MapDirection.NORTH, new Vector2d(2,2));
 
-        animal1 = new Animal();
-        animal2 = new Animal(MapDirection.SOUTH, new Vector2d(0,0));
-        animal3 = new Animal(MapDirection.WEST, new Vector2d(1,1));
-        animal4 = new Animal(MapDirection.EAST, new Vector2d(4,2));
+        map = new RectangularMap(5,5);
+        animal22North = new Animal(map, new Vector2d(2,2),MapDirection.NORTH);
+
+        animal1 = new Animal(map, new Vector2d(2,2));
+        animal2 = new Animal(map,new Vector2d(0,0),MapDirection.SOUTH);
+        animal3 = new Animal(map,new Vector2d(1,1),MapDirection.WEST);
+        animal4 = new Animal(map,new Vector2d(4,2),MapDirection.EAST);
 
         res1 = "Animal{orientation=Polnoc, position=(2,2)}";
         res2 = "Animal{orientation=Poludnie, position=(0,0)}";
