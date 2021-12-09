@@ -6,6 +6,7 @@ public class GrassField extends AbstractWorldMap{
 
     private final Integer grassBorder;
     private final Map<Vector2d,Grass> grasses;
+    private final MapBoundary mapBoundary = new MapBoundary();
 
     public GrassField(Integer grassQuantity) {
         this.grasses = new HashMap<>();
@@ -31,7 +32,6 @@ public class GrassField extends AbstractWorldMap{
         }
         return false;
     }
-
     @Override
     public boolean canMoveTo(Vector2d position) {
         if (super.canMoveTo(position)){
@@ -44,7 +44,7 @@ public class GrassField extends AbstractWorldMap{
     public boolean place(Animal animal) {
         if (super.place(animal)){
             mapBoundary.addObject(animal.getPosition());
-            animal.addObserver(this);
+            animal.addObserver(mapBoundary);
             return true;
         }
         throw new IllegalArgumentException(animal.getPosition().toString() + " invalid position");
@@ -61,4 +61,30 @@ public class GrassField extends AbstractWorldMap{
         if (super.objectAt(position) != null) return super.objectAt(position);
         return grasses.get(position);
     }
+
+    @Override
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        if (objectAt(newPosition) instanceof Grass){
+            grasses.remove(newPosition);
+            animals.put(newPosition,animals.get(oldPosition));
+            animals.remove(oldPosition);
+            while (true){
+                if (placeGrass()) break;
+            };
+        }else{
+            animals.put(newPosition,animals.get(oldPosition));
+            animals.remove(oldPosition);
+        }
+    }
+
+
+    @Override
+    public Vector2d getLeftBottomCorner(){
+        return mapBoundary.getLeftBottomCorner();
+    }
+    @Override
+    public Vector2d getRightTopCorner(){
+        return mapBoundary.getRightTopCorner();
+    }
+
 }

@@ -6,8 +6,8 @@ import java.util.List;
 public class Animal{
     private MapDirection orientation;
     private Vector2d position;
-    private IWorldMap map;
-    private List<IPositionChangeObserver> observers = new ArrayList<>();
+    private final IWorldMap map;
+    private final List<IPositionChangeObserver> observers = new ArrayList<>();
 
     public Animal(IWorldMap map, Vector2d initialPosition){
         this.orientation = MapDirection.NORTH;
@@ -52,6 +52,7 @@ public class Animal{
                     Vector2d old_location = this.position;
                     this.position = new_location;
                     positionChanged(old_location, new_location);
+
                 }
             }
             case BACKWARD -> {

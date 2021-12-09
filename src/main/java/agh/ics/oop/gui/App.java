@@ -10,16 +10,37 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
+import java.util.List;
+
+import static java.lang.System.exit;
+
 public class App extends Application {
+    AbstractWorldMap map;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        try {
+            map = new GrassField(10);
+            String[] args = new String[]{"f", "f" ,"r" , "f", "f", "f", "f", "f"};
+            List<MoveDirection> directions = new OptionsParser().parse(args);
+            Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4) };
+            IEngine engine = new SimulationEngine(directions, map, positions);
+            engine.run();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e);
+            exit(0);
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) {
         GridPane grid = new GridPane();
-        AbstractWorldMap map = new GrassField(10);
         createAxes(grid,map);
         addObjects(grid,map);
 
@@ -56,13 +77,13 @@ public class App extends Application {
         }
     }
     public void addObjects(GridPane grid, AbstractWorldMap map){
-        Integer minX = map.getLeftBottomCorner().x;
-        Integer minY = map.getLeftBottomCorner().y;
-        Integer maxX = map.getRightTopCorner().x;
-        Integer maxY = map.getRightTopCorner().y;
+        int minX = map.getLeftBottomCorner().x;
+        int minY = map.getLeftBottomCorner().y;
+        int maxX = map.getRightTopCorner().x;
+        int maxY = map.getRightTopCorner().y;
 
-        for(Integer x = minX; x<=maxX ; x++){
-            for (Integer y = minY; y<=maxY ; y++){
+        for(int x = minX; x<=maxX ; x++){
+            for (int y = minY; y<=maxY ; y++){
                 Vector2d pos = new Vector2d(x,y);
                 if (map.isOccupied(pos)){
                     Object object = map.objectAt(pos);

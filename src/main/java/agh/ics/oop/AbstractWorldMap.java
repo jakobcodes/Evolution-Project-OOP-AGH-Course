@@ -1,12 +1,10 @@
 package agh.ics.oop;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObserver{
     protected Map<Vector2d,Animal> animals = new LinkedHashMap<>();
-    protected final MapBoundary mapBoundary = new MapBoundary();;
 
     @Override
     public boolean canMoveTo(Vector2d position) {
@@ -17,7 +15,7 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     public boolean place(Animal animal) {
         if (canMoveTo(animal.getPosition())){
             animals.put(animal.getPosition(), animal);
-            animal.addObserver(mapBoundary);
+            animal.addObserver(this);
             return true;
         }
         throw new IllegalArgumentException( animal.getPosition().toString() + " invalid position");
@@ -39,10 +37,10 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
         animals.remove(oldPosition);
     }
     public Vector2d getLeftBottomCorner(){
-        return mapBoundary.getLeftBottomCorner();
+        return new Vector2d(0,0);
     }
     public Vector2d getRightTopCorner(){
-        return mapBoundary.getRightTopCorner();
+        return new Vector2d(1,1);
     }
 
     @Override
