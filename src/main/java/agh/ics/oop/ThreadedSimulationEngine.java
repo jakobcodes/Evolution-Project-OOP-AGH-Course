@@ -8,19 +8,23 @@ public class ThreadedSimulationEngine implements IEngine, Runnable{
     private List<MoveDirection> directions;
     private final AbstractWorldMap map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
+    private int moveDelay;
 
     public ThreadedSimulationEngine(List<MoveDirection> moves, AbstractWorldMap map, Vector2d[] initialPositions) {
         this.directions = moves;
         this.map = map;
+        this.moveDelay = 1000;
 
         for (Vector2d pos : initialPositions){
             Animal animal = new Animal(map,pos);
             map.place(animal);
         }
     }
+
     public ThreadedSimulationEngine(AbstractWorldMap map, Vector2d[] initialPositions) {
         this.directions = new ArrayList<>();
         this.map = map;
+        this.moveDelay = 1000;
 
         for (Vector2d pos : initialPositions){
             Animal animal = new Animal(map,pos);
@@ -41,14 +45,19 @@ public class ThreadedSimulationEngine implements IEngine, Runnable{
             positionChanged(oldPosition, newPosition);
             i++;
             System.out.println(map);
+            try {
+                Thread.sleep(moveDelay);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
     private List<Animal> getAnimalsOnMap (){
         List<Animal> animals = new ArrayList<>();
-        int minX = map.getLeftBottomCorner().x;
-        int minY = map.getLeftBottomCorner().y;
-        int maxX = map.getRightTopCorner().x;
-        int maxY = map.getRightTopCorner().y;
+        int minX = map.getLeftBottomCorner().getX();
+        int minY = map.getLeftBottomCorner().getY();
+        int maxX = map.getRightTopCorner().getX();
+        int maxY = map.getRightTopCorner().getY();
         for (int x = minX;x <= maxX; x++){
             for (int y = minY; y <= maxY; y++){
                 Vector2d pos = new Vector2d(x,y);

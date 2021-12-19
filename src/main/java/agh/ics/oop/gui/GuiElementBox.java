@@ -25,7 +25,7 @@ public class GuiElementBox {
             imageView.setFitHeight(20);
             imageView.setFitWidth(20);
             Label label;
-            if (iMapElement instanceof Animal) label = new Label("Z ("+iMapElement.getPosition().x + "," + iMapElement.getPosition().y + ")");
+            if (iMapElement instanceof Animal) label = new Label("Z ("+ iMapElement.getPosition().getX() + "," + iMapElement.getPosition().getY() + ")");
             else label = new Label("Trawa");
             this.vBox = new VBox(imageView, label);
             this.vBox.setAlignment(Pos.CENTER);

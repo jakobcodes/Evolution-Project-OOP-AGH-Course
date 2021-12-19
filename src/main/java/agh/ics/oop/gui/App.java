@@ -22,7 +22,6 @@ public class App extends Application implements IPositionChangeObserver{
     private AbstractWorldMap map;
     private GridPane grid;
     private ThreadedSimulationEngine engine;
-    private int moveDelay;
 
     public static void main(String[] args) {
         launch(args);
@@ -40,7 +39,6 @@ public class App extends Application implements IPositionChangeObserver{
             Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4) };
             this.engine = new ThreadedSimulationEngine(map, positions);
             this.engine.addObserver(this);
-            this.moveDelay = 1000;
         } catch (IllegalArgumentException e) {
             System.out.println(e);
             exit(0);
@@ -79,10 +77,10 @@ public class App extends Application implements IPositionChangeObserver{
     public void createAxes(){
 
 
-        Integer minX = this.map.getLeftBottomCorner().x;
-        Integer minY = this.map.getLeftBottomCorner().y;
-        Integer maxX = this.map.getRightTopCorner().x;
-        Integer maxY = this.map.getRightTopCorner().y;
+        Integer minX = this.map.getLeftBottomCorner().getX();
+        Integer minY = this.map.getLeftBottomCorner().getY();
+        Integer maxX = this.map.getRightTopCorner().getX();
+        Integer maxY = this.map.getRightTopCorner().getY();
 
         Label yx = new Label("y/x");
         this.grid.add(yx, 0, 1,1,1);
@@ -104,10 +102,10 @@ public class App extends Application implements IPositionChangeObserver{
         }
     }
     public void addObjects(){
-        int minX = map.getLeftBottomCorner().x;
-        int minY = map.getLeftBottomCorner().y;
-        int maxX = map.getRightTopCorner().x;
-        int maxY = map.getRightTopCorner().y;
+        int minX = map.getLeftBottomCorner().getX();
+        int minY = map.getLeftBottomCorner().getY();
+        int maxX = map.getRightTopCorner().getX();
+        int maxY = map.getRightTopCorner().getY();
 
         for(int x = minX; x<=maxX ; x++){
             for (int y = minY; y<=maxY ; y++){
@@ -122,11 +120,6 @@ public class App extends Application implements IPositionChangeObserver{
 
     @Override
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
-        try {
-            Thread.sleep(moveDelay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Platform.runLater(() -> {
 //            Node node = this.grid.getChildren().get(0);
 //            grid.getChildren().clear();
