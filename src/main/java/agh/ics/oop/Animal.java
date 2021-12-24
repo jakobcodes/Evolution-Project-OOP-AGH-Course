@@ -3,21 +3,20 @@ package agh.ics.oop;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Animal implements IMapElement{
+public class Animal implements IMapElement, Comparable<Animal>{
     private MapDirection orientation;
     private Vector2d position;
-    private final IWorldMap map;
+    private final AbstractWorldMap map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
+    private Energy energy;
+    private final Genome genome;
 
-    public Animal(IWorldMap map, Vector2d initialPosition){
+    public Animal(AbstractWorldMap map, Vector2d initialPosition){
         this.orientation = MapDirection.NORTH;
         this.position = initialPosition;
         this.map = map;
-    }
-    public Animal(IWorldMap map, Vector2d initialPosition, MapDirection direction){
-        this.orientation = direction;
-        this.position = initialPosition;
-        this.map = map;
+        this.energy = new Energy(Parameters.getStartEnergy());
+        this.genome = new Genome();
     }
 
     public MapDirection getOrientation() { return orientation; }
@@ -33,6 +32,10 @@ public class Animal implements IMapElement{
             case SOUTH -> "src/main/resources/down.png";
             case WEST -> "src/main/resources/left.png";
             case EAST -> "src/main/resources/right.png";
+            case NORTH_EAST -> "src/main/resources/up.png";
+            case NORTH_WEST -> "src/main/resources/up.png";
+            case SOUTH_EAST -> "src/main/resources/down.png";
+            case SOUTH_WEST -> "src/main/resources/down.png";
         };
     }
 
@@ -45,37 +48,56 @@ public class Animal implements IMapElement{
     }
 
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition){
-        observers.forEach(e -> e.positionChanged(oldPosition,newPosition));
+        observers.forEach(e -> e.positionChanged(oldPosition,newPosition,this));
     }
 
-    public void move(MoveDirection direction){
+    public void move(Integer direction){
         switch (direction){
-            case RIGHT -> {
+            // FORWARD
+            case 0 -> {
+                Vector2d newPosition = this.position.add(this.orientation.toUnitVector());
+                if (map.canMoveTo(newPosition)){
+                    Vector2d newPos = this.map.calculateNewPosition(newPosition);
+                    Vector2d oldPosition = this.position;
+                    this.position = newPos;
+                    positionChanged(oldPosition, newPos);
+                }
+            }
+            // BACKWARD
+            case 4 -> {
+                Vector2d newPosition = this.position.subtract(this.orientation.toUnitVector());
+                if (map.canMoveTo(newPosition)){
+                    Vector2d newPos = this.map.calculateNewPosition(newPosition);
+                    Vector2d oldPosition = this.position;
+                    this.position = newPos;
+                    positionChanged(oldPosition, newPos);
+                }
+            }
+        }
+        if(direction != 4){
+            for(int i=0;i<direction;i++){
                 this.orientation = this.orientation.next();
-            }
-            case LEFT -> {
-                this.orientation = this.orientation.previous();
-            }
-            case FORWARD -> {
-                Vector2d new_location = this.position.add(this.orientation.toUnitVector());
-                if (map.canMoveTo(new_location)){
-                    Vector2d old_location = this.position;
-                    this.position = new_location;
-                    positionChanged(old_location, new_location);
-                }
-            }
-            case BACKWARD -> {
-                Vector2d new_location = this.position.subtract(this.orientation.toUnitVector());
-                if (map.canMoveTo(new_location)){
-                    Vector2d old_location = this.position;
-                    this.position = new_location;
-                    positionChanged(old_location, new_location);
-                }
             }
         }
     }
     @Override
     public String toString() {
         return orientation.toString();
+    }
+
+    public Energy getEnergy() {
+        return energy;
+    }
+    public void setEnergy(Energy energy) {
+        this.energy = energy;
+    }
+
+    @Override
+    public int compareTo(Animal o) {
+        return this.getEnergy().getValue().compareTo(o.getEnergy().getValue());
+    }
+
+    public Genome getGenome() {
+        return genome;
     }
 }

@@ -4,6 +4,7 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import static java.lang.System.exit;
 
-public class App extends Application implements IPositionChangeObserver{
+public class App extends Application implements IPositionChangeObserver<Animal>{
     private AbstractWorldMap map;
     private GridPane grid;
     private ThreadedSimulationEngine engine;
@@ -33,11 +34,8 @@ public class App extends Application implements IPositionChangeObserver{
         try {
             this.grid = new GridPane();
             this.grid.setGridLinesVisible(true);
-            map = new GrassField(10);
-//            String[] args = new String[]{"f", "f" ,"r" , "f", "f", "f", "f", "r", "r", "f", "f", "f", "f", "f"};
-//            List<MoveDirection> directions = new OptionsParser().parse(args);
-            Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4) };
-            this.engine = new ThreadedSimulationEngine(map, positions);
+            map = new WrappedStepMap(15,15,1,1,1,3);
+            this.engine = new ThreadedSimulationEngine(map);
             this.engine.addObserver(this);
         } catch (IllegalArgumentException e) {
             System.out.println(e);
@@ -63,7 +61,7 @@ public class App extends Application implements IPositionChangeObserver{
         startButton.setOnAction((event) -> {
             String[] dir = textField.getText().split("");
             List<MoveDirection> directions = new OptionsParser().parse(dir);
-            this.engine.setDirections(directions);
+//            this.engine.setDirections(directions);
             Thread engineThread = new Thread(this.engine);
             engineThread.start();
         });
@@ -119,7 +117,7 @@ public class App extends Application implements IPositionChangeObserver{
     }
 
     @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
         Platform.runLater(() -> {
 //            Node node = this.grid.getChildren().get(0);
 //            grid.getChildren().clear();
@@ -130,5 +128,4 @@ public class App extends Application implements IPositionChangeObserver{
             addObjects();
         });
     }
-
 }
