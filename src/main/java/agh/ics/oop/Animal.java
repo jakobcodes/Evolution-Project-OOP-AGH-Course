@@ -18,6 +18,13 @@ public class Animal implements IMapElement, Comparable<Animal>{
         this.energy = new Energy(Parameters.getStartEnergy());
         this.genome = new Genome();
     }
+    public Animal(AbstractWorldMap map, Vector2d initialPosiiton, Genome genome, Energy energy){
+        this.orientation = MapDirection.NORTH;
+        this.position = initialPosiiton;
+        this.map = map;
+        this.energy = energy;
+        this.genome = genome;
+    }
 
     public MapDirection getOrientation() { return orientation; }
 

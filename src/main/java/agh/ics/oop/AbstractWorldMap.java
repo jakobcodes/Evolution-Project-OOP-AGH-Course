@@ -45,6 +45,10 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
         return animals.get(position);
     }
 
+    public void deleteAnimal(Animal animal){
+        objectsAt(animal.getPosition()).remove(animal);
+    }
+
     @Override
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
         animals.putIfAbsent(newPosition, new LinkedList<>());

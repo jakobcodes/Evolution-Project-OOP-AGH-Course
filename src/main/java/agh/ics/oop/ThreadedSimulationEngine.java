@@ -1,6 +1,7 @@
 package agh.ics.oop;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,12 +26,71 @@ public class ThreadedSimulationEngine implements IEngine, Runnable{
     @Override
     public void run() {
         List<Animal> animals = getAnimalsOnMap();
+        List<Animal> deadAnimals = deleteAnimals(animals);
+        animals.removeAll(deadAnimals);
         moveAnimals(animals);
+        animalsEat(animals);
+        animalsBreed(animals);
+    }
+
+    private void animalsBreed(List<Animal> animals) {
+        int minx = this.map.getLeftBottomCorner().getX();
+        int miny = this.map.getLeftBottomCorner().getY();
+        int maxx = this.map.getRightTopCorner().getX();
+        int maxy = this.map.getRightTopCorner().getY();
+        Animal firstParent,secondParent;
+        for (int x=minx;x<=maxx;x++){
+            for (int y=miny;y<=maxy;y++){
+                List<Animal> animalsOnPos = this.map.objectsAt(new Vector2d(x,y));
+                if(animalsOnPos.size() > 2){
+                    Collections.sort(animalsOnPos);
+                    Collections.reverse(animalsOnPos);
+                    firstParent = animalsOnPos.get(0);
+                    secondParent = animalsOnPos.get(1);
+                }else if (animalsOnPos.size() == 2){
+                    firstParent = animalsOnPos.get(0);
+                    secondParent = animalsOnPos.get(1);
+                }else{
+                    return;
+                }
+            }
+        }
+
+    }
+    private Animal bornNewAnimal(Animal father, Animal mother){
+        Genome childGenome;
+        Energy fatherEnergy = father.getEnergy();
+        Energy motherEnergy = mother.getEnergy();
+        Float fatherPercent = fatherEnergy.getPercent(motherEnergy);
+        Integer fatherNumberGenes = (fatherPercent * 32); // TODO: naprawic floata zeby zaokraglal do 2 miejsc
+        Integer motherNumberGenes = 32 - fatherNumberGenes;
+        if(fatherNumberGenes > motherNumberGenes){
+            childGenome = father.getGenome().createMixedGenome(mother.getGenome(), motherNumberGenes);
+        }else{
+            childGenome = mother.getGenome().createMixedGenome(father.getGenome(), fatherNumberGenes);
+        }
+        return new Animal(this.map, father.getPosition(), energy, childGenome);// TODO : implement child energy
+
+    }
+
+    private void animalsEat(List<Animal> animals) {
         animals.forEach(animal -> {
             List<Animal> candidates = this.map.animalsWithMaxEnergyAt(animal.getPosition());
-            animal.setEnergy(EnergyCalculator.calculatePlantEnergy(animal.getEnergy(), (Integer) candidates.size()));
+            animal.setEnergy(EnergyCalculator.calculatePlantEnergy(animal.getEnergy(), candidates.size()));
         });
     }
+
+    private List<Animal> deleteAnimals(List<Animal> animals) {
+        List<Animal> deadAnimals = new LinkedList<>();
+        animals.forEach(animal -> {
+            if (EnergyCalculator.isTooLowOnEnergy(animal.getEnergy())){
+                this.map.deleteAnimal(animal);
+                deadAnimals.add(animal);
+            }
+        });
+        return deadAnimals;
+    }
+
     private void moveAnimals(List<Animal> animals){
         animals.forEach(animal -> {
             Vector2d oldPosition = animal.getPosition();

@@ -17,5 +17,8 @@ public class EnergyCalculator {
         Integer calculatedPlantEnergy = currentEnergy.getValue()/4;
         return currentEnergy.subtract(new Energy(calculatedPlantEnergy));
     }
+    public static boolean isTooLowOnEnergy(Energy currentEnergy){
+        return currentEnergy.getValue() < moveEnergy.getValue();
+    }
 
 }

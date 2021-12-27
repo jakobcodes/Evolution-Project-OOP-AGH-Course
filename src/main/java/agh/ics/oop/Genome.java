@@ -11,6 +11,10 @@ public class Genome {
         this.genes = getRandomGenome();
     }
 
+    public Genome(List<Gene> genes){
+        this.genes = genes;
+    }
+
     public int getRandomDirection(){
         Random random = new Random();
         return this.genes.get(random.nextInt(GENOME_SIZE)).getValue();
@@ -29,6 +33,29 @@ public class Genome {
             }
         });
         return list;
+    }
+    private List<Gene> getLeft(Integer size){
+        return this.genes.subList(0,size-1);
+    }
+    private List<Gene> getRight(Integer size){
+        return this.genes.subList(31-size, 31);
+    }
+
+    public Genome createMixedGenome(Genome other, Integer otherGenesNumber){
+        List<Gene> genes = new LinkedList<>();
+        List<Gene> left,right;
+
+        Random random = new Random();
+        if(random.nextBoolean()){
+            left = getLeft(32-otherGenesNumber);
+            right = other.getRight(otherGenesNumber);
+        }else{
+            left = other.getLeft(otherGenesNumber);
+            right = getRight(32-otherGenesNumber);
+        }
+        left.addAll(right);
+        return new Genome(left);
+
     }
 
     @Override
