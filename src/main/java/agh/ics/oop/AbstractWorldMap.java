@@ -78,12 +78,4 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     public abstract void incrementLifetime();
     public abstract int countAvgChildren();
 
-
-
-    @Override
-    public String toString() {
-        return new MapVisualizer(this).draw(getLeftBottomCorner(), getRightTopCorner());
-    }
-
-
 }
