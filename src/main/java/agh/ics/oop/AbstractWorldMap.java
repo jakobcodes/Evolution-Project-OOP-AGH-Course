@@ -4,13 +4,13 @@ import java.util.*;
 
 abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObserver<Animal>{
     protected Map<Vector2d, List<Animal>> animals = new LinkedHashMap<>();
+    protected List<Animal> deadAnimals = new LinkedList<>();
 
-    @Override
     public boolean canMoveTo(Vector2d position) {
         return !isOccupied(position);
     }
 
-    @Override
+
     public boolean place(Animal animal) {
         if (canMoveTo(animal.getPosition())){
             animals.putIfAbsent(animal.getPosition(), new LinkedList<>());
@@ -22,18 +22,18 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
         throw new IllegalArgumentException( animal.getPosition().toString() + " invalid position");
     }
 
-    @Override
     public boolean isOccupied(Vector2d position) {
-        return animals.get(position) != null && animals.get(position).size() != 0;
+        if (animals.get(position) == null) return false;
+        return animals.get(position).size() != 0;
     }
 
-    @Override
     public Object objectAt(Vector2d position) {
-        if (animals.get(position).size() == 0 || !isOccupied(position)) {
-            animals.remove(position);
+        if (animals.get(position) != null && animals.get(position).size() > 0){
+            return animals.get(position).get(animals.get(position).size()-1);
+        }else{
             return null;
         }
-        return animals.get(position).get(animals.get(position).size()-1);
+
     }
     public List<Animal> animalsWithMaxEnergyAt(Vector2d position){
         Animal firstAnimal = (Animal) objectAt(position);
@@ -46,6 +46,7 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     }
 
     public void deleteAnimal(Animal animal){
+        deadAnimals.add(animal);
         objectsAt(animal.getPosition()).remove(animal);
     }
 
@@ -58,7 +59,6 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     }
     protected void removeAnimalFromMap(Vector2d position, Animal animal){
         animals.get(position).remove(animal);
-        if (animals.get(position).size() == 0) animals.remove(position);
     }
 
     public abstract Vector2d getLeftBottomCorner();
@@ -66,6 +66,17 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     public abstract void placeGrass();
     public abstract Vector2d calculateNewPosition(Vector2d newPosition);
     public abstract Vector2d getFreePos();
+    protected abstract List<Animal> getAnimalsOnMap();
+    public abstract void deleteAnimals();
+    public abstract void animalsBreed();
+    public abstract void moveAnimals();
+    public abstract void eatGrass();
+    public abstract int countAnimals();
+    public abstract int countGrasses();
+    public abstract int countAvgEnergy();
+    public abstract int countAvgLifetime();
+    public abstract void incrementLifetime();
+    public abstract int countAvgChildren();
 
 
 

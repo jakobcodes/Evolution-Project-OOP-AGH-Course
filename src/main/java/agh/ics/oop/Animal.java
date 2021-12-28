@@ -7,9 +7,11 @@ public class Animal implements IMapElement, Comparable<Animal>{
     private MapDirection orientation;
     private Vector2d position;
     private final AbstractWorldMap map;
-    private final List<IPositionChangeObserver> observers = new ArrayList<>();
+    private final List<IPositionChangeObserver<Animal>> observers = new ArrayList<>();
     private Energy energy;
     private final Genome genome;
+    private int lifetime;
+    private int children;
 
     public Animal(AbstractWorldMap map, Vector2d initialPosition){
         this.orientation = MapDirection.NORTH;
@@ -24,6 +26,8 @@ public class Animal implements IMapElement, Comparable<Animal>{
         this.map = map;
         this.energy = energy;
         this.genome = genome;
+        this.lifetime = 0;
+        this.children = 0;
     }
 
     public MapDirection getOrientation() { return orientation; }
@@ -34,23 +38,20 @@ public class Animal implements IMapElement, Comparable<Animal>{
 
     @Override
     public String getPathToImage() {
-        return switch(this.orientation) {
-            case NORTH -> "src/main/resources/up.png";
-            case SOUTH -> "src/main/resources/down.png";
-            case WEST -> "src/main/resources/left.png";
-            case EAST -> "src/main/resources/right.png";
-            case NORTH_EAST -> "src/main/resources/up.png";
-            case NORTH_WEST -> "src/main/resources/up.png";
-            case SOUTH_EAST -> "src/main/resources/down.png";
-            case SOUTH_WEST -> "src/main/resources/down.png";
-        };
+        if (energy.getValue() >= Parameters.getStartEnergy()){
+            return "src/main/resources/animal-green.png";
+        } else if (energy.getValue() >= Parameters.getStartEnergy()/2) {
+            return "src/main/resources/animal-yellow.png";
+        }else{
+            return "src/main/resources/animal-red.png";
+        }
     }
 
-    public void addObserver(IPositionChangeObserver observer){
+    public void addObserver(IPositionChangeObserver<Animal> observer){
         observers.add(observer);
     }
 
-    public void removeObserver(IPositionChangeObserver observer){
+    public void removeObserver(IPositionChangeObserver<Animal> observer){
         observers.remove(observer);
     }
 
@@ -87,6 +88,29 @@ public class Animal implements IMapElement, Comparable<Animal>{
             }
         }
     }
+    public Animal breed(Animal other){
+        Genome childGenome;
+        Energy childEnergy;
+        Energy thisAnimalEnergy = this.getEnergy();
+        Energy otherAnimalEnergy = other.getEnergy();
+        Float fatherPercent = thisAnimalEnergy.getPercent(otherAnimalEnergy);
+        int thisNumberGenes = Math.round((fatherPercent * 32 * 100)/100);
+        int otherNumberGenes = 32 - thisNumberGenes;
+        if(thisNumberGenes > otherNumberGenes){
+            childGenome = this.getGenome().createMixedGenome(other.getGenome(), otherNumberGenes);
+        }else{
+            childGenome = other.getGenome().createMixedGenome(this.getGenome(), thisNumberGenes);
+        }
+        Energy e1 = new Energy(0).addQuarter(thisAnimalEnergy);
+        Energy e2 = new Energy(0).addQuarter(otherAnimalEnergy);
+        childEnergy = e1.add(e2);
+        this.setEnergy(EnergyCalculator.calculateBreedEnergy(this.getEnergy()));
+        other.setEnergy(EnergyCalculator.calculateBreedEnergy(other.getEnergy()));
+
+        return new Animal(this.map, this.getPosition(), childGenome,childEnergy);
+    }
+
+
     @Override
     public String toString() {
         return orientation.toString();
@@ -106,5 +130,19 @@ public class Animal implements IMapElement, Comparable<Animal>{
 
     public Genome getGenome() {
         return genome;
+    }
+
+    public int getLifetime() {
+        return lifetime;
+    }
+    public void incrementLifetime(){
+        this.lifetime++;
+    }
+    public void incrementChildren(){
+        this.children++;
+    }
+
+    public int getChildren() {
+        return children;
     }
 }

@@ -4,25 +4,29 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.System.exit;
 
-public class App extends Application implements IPositionChangeObserver<Animal>{
-    private AbstractWorldMap map;
-    private GridPane grid;
-    private ThreadedSimulationEngine engine;
+public class App extends Application implements IDayFinishedObserver{
+    private AbstractWorldMap leftMap;
+    private AbstractWorldMap rightMap;
+    private BorderPane mainPane;
+    private GridPane leftMapGrid;
+    private GridPane rightMapGrid;
+    private Thread leftEngineThread;
+    private Thread rightEngineThread;
+    private final int boxSize = 30;
+    private Menu menu;
+    private boolean isLeftRunning;
+    private boolean isRightRunning;
 
     public static void main(String[] args) {
         launch(args);
@@ -32,11 +36,13 @@ public class App extends Application implements IPositionChangeObserver<Animal>{
     public void init() throws Exception {
         super.init();
         try {
-            this.grid = new GridPane();
-            this.grid.setGridLinesVisible(true);
-            map = new WrappedStepMap(15,15,1,1,1,3);
-            this.engine = new ThreadedSimulationEngine(map);
-            this.engine.addObserver(this);
+            this.menu = new Menu();
+            this.mainPane = new BorderPane();
+            this.leftMapGrid = new GridPane();
+            this.rightMapGrid = new GridPane();
+            leftMapGrid.setGridLinesVisible(true);
+            rightMapGrid.setGridLinesVisible(true);
+
         } catch (IllegalArgumentException e) {
             System.out.println(e);
             exit(0);
@@ -45,61 +51,109 @@ public class App extends Application implements IPositionChangeObserver<Animal>{
 
     @Override
     public void start(Stage primaryStage) {
-        createInterface();
-        createAxes();
-        addObjects();
-
-
-        Scene scene = new Scene(this.grid, 800, 600);
-        primaryStage.setScene(scene);
+        primaryStage.setScene(menu.getScene());
         primaryStage.show();
 
-    }
-    public void createInterface(){
-        TextField textField = new TextField();
-        Button startButton = new Button("start");
-        startButton.setOnAction((event) -> {
-            String[] dir = textField.getText().split("");
-            List<MoveDirection> directions = new OptionsParser().parse(dir);
-//            this.engine.setDirections(directions);
-            Thread engineThread = new Thread(this.engine);
-            engineThread.start();
-        });
-        HBox hBox = new HBox(startButton, textField);
-        this.grid.add(hBox, 0,0,4,1);
-        GridPane.setHalignment(hBox, HPos.CENTER);
-        this.grid.getColumnConstraints().add(new ColumnConstraints(50));
-        this.grid.getRowConstraints().add(new RowConstraints(50));
+        menu.getStartButton().setOnAction((event -> {
+            this.menu.submitInputs();
+            Scene scene = new Scene(this.mainPane, 1600, 900);
+            createInterface();
+            primaryStage.setScene(scene);
+        }));
     }
 
-    public void createAxes(){
+    private void createInterface(){
+//        MAPS
+        this.leftMap = new StepMap(agh.ics.oop.Parameters.getWIDTH(), agh.ics.oop.Parameters.getHEIGHT(), agh.ics.oop.Parameters.getJungleRatio());
+        this.rightMap = new WrappedStepMap(agh.ics.oop.Parameters.getWIDTH(),agh.ics.oop.Parameters.getHEIGHT(),agh.ics.oop.Parameters.getJungleRatio());
+        ThreadedSimulationEngine leftEngine = new ThreadedSimulationEngine(leftMap);
+        leftEngine.addObserver(this);
+        ThreadedSimulationEngine rightEngine = new ThreadedSimulationEngine(rightMap);
+        rightEngine.addObserver(this);
+        this.leftEngineThread = new Thread(leftEngine);
+        this.rightEngineThread = new Thread(rightEngine);
+        createAxes(leftMapGrid,leftMap);
+        createAxes(rightMapGrid,rightMap);
+        addObjects(leftMapGrid,leftMap);
+        addObjects(rightMapGrid,rightMap);
+//        THREAD
+        this.leftEngineThread.start();
+        this.rightEngineThread.start();
+        isLeftRunning = true;
+        isRightRunning = true;
+//        CHART
+        Chart leftChart = new Chart(this.leftMap);
+        Chart rightChart = new Chart(this.rightMap);
+        leftEngine.addObserver(leftChart);
+        rightEngine.addObserver(rightChart);
+        HBox charts = new HBox(leftChart.getLineChart(),rightChart.getLineChart());
+        this.mainPane.setCenter(charts);
 
 
-        Integer minX = this.map.getLeftBottomCorner().getX();
-        Integer minY = this.map.getLeftBottomCorner().getY();
-        Integer maxX = this.map.getRightTopCorner().getX();
-        Integer maxY = this.map.getRightTopCorner().getY();
+//        STOP BUTTONS
+        Button leftStopButton = new Button("stop");
+        Button rightStopButton = new Button("stop");
+        leftStopButton.setOnAction((event -> {
+            if (isLeftRunning){
+                this.leftEngineThread.suspend();
+                isLeftRunning = false;
+                leftStopButton.setText("start");
+            }else{
+                this.leftEngineThread.resume();
+                isLeftRunning = true;
+                leftStopButton.setText("stop");
+            }
+
+        }));
+        rightStopButton.setOnAction((event -> {
+            if (isRightRunning){
+                this.rightEngineThread.suspend();
+                isRightRunning = false;
+                rightStopButton.setText("start");
+            }else{
+                this.rightEngineThread.resume();
+                isRightRunning = true;
+                rightStopButton.setText("stop");
+            }
+
+        }));
+
+        VBox leftVBox = new VBox(leftMapGrid, leftStopButton);
+        VBox rightVBox = new VBox(rightMapGrid, rightStopButton);
+
+        mainPane.setLeft(leftVBox);
+        mainPane.setRight(rightVBox);
+
+    }
+
+    public void createAxes(GridPane grid, AbstractWorldMap map){
+        grid.getColumnConstraints().clear();
+        grid.getRowConstraints().clear();
+        Integer minX = map.getLeftBottomCorner().getX();
+        Integer minY = map.getLeftBottomCorner().getY();
+        Integer maxX = map.getRightTopCorner().getX();
+        Integer maxY = map.getRightTopCorner().getY();
 
         Label yx = new Label("y/x");
-        this.grid.add(yx, 0, 1,1,1);
+        grid.add(yx, 0, 0,1,1);
         GridPane.setHalignment(yx, HPos.CENTER);
 
-        this.grid.getColumnConstraints().add(new ColumnConstraints(50));
-        this.grid.getRowConstraints().add(new RowConstraints(50));
+        grid.getColumnConstraints().add(new ColumnConstraints(boxSize));
+        grid.getRowConstraints().add(new RowConstraints(boxSize));
         for(Integer i = minX; i<= maxX;i++ ){
             Label label = new Label(i.toString());
-            this.grid.add(label, i-minX+1, 1,1,1);
-            this.grid.getColumnConstraints().add(new ColumnConstraints(50));
+            grid.add(label, i-minX+1, 0,1,1);
+            grid.getColumnConstraints().add(new ColumnConstraints(boxSize));
             GridPane.setHalignment(label, HPos.CENTER);
         }
         for(Integer i = maxY; i >= minY;i--){
             Label label = new Label(i.toString());
-            this.grid.add(label, 0, maxY-i+1+1,1,1);
-            this.grid.getRowConstraints().add(new RowConstraints(50));
+            grid.add(label, 0, maxY-i+1,1,1);
+            grid.getRowConstraints().add(new RowConstraints(boxSize));
             GridPane.setHalignment(label, HPos.CENTER);
         }
     }
-    public void addObjects(){
+    public void addObjects(GridPane grid, AbstractWorldMap map){
         int minX = map.getLeftBottomCorner().getX();
         int minY = map.getLeftBottomCorner().getY();
         int maxX = map.getRightTopCorner().getX();
@@ -110,22 +164,22 @@ public class App extends Application implements IPositionChangeObserver<Animal>{
                 Vector2d pos = new Vector2d(x,y);
                 if (map.isOccupied(pos)){
                     IMapElement iMapElement = (IMapElement) map.objectAt(pos);
-                    this.grid.add(new GuiElementBox(iMapElement).getvBox(), x-minX+1, maxY+1-y+1,1,1);
+
+                    grid.add(new GuiElementBox(iMapElement).getvBox(), x-minX+1, maxY+1-y,1,1);
                 }
             }
         }
     }
-
     @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
+    public void dayFinished() {
         Platform.runLater(() -> {
-//            Node node = this.grid.getChildren().get(0);
-//            grid.getChildren().clear();
-//            this.grid.getChildren().add(node);
-            this.grid.getChildren().retainAll(grid.getChildren().get(0));
-            createInterface();
-            createAxes();
-            addObjects();
+            mapUpdate(leftMapGrid, leftMap);
+            mapUpdate(rightMapGrid, rightMap);
         });
+    }
+    private void mapUpdate(GridPane grid, AbstractWorldMap map){
+        grid.getChildren().retainAll(grid.getChildren().get(0));
+        createAxes(grid,map);
+        addObjects(grid,map);
     }
 }

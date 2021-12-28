@@ -1,6 +1,6 @@
 package agh.ics.oop;
 
-public class Gene{
+public class Gene implements Comparable<Gene>{
     private final Integer value;
 
     public Gene(int gene) {
@@ -17,4 +17,9 @@ public class Gene{
         return value;
     }
 
+
+    @Override
+    public int compareTo(Gene o) {
+        return Integer.compare(this.getValue(), o.getValue());
+    }
 }

@@ -1,5 +1,8 @@
 package agh.ics.oop;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class Energy implements Comparable<Energy>{
     private final Integer value;
 
@@ -19,9 +22,15 @@ public class Energy implements Comparable<Energy>{
         return new Energy(this.value - other.getValue());
     }
     public Float getPercent(Energy other){
-        return (this.getValue()/(this.getValue() + other.getValue())); // TODO: powinien zwracac floata do dwoch miejsc
+        BigDecimal bg1 = new BigDecimal(this.getValue());
+        BigDecimal bg2 = new BigDecimal(this.getValue() + other.getValue());
+        return bg1.divide(bg2, 2, RoundingMode.FLOOR).floatValue();
     }
 
+    public Energy addQuarter(Energy other){
+        int otherValue = (int) Math.round(other.getValue() * 0.25);
+        return this.add(new Energy(otherValue));
+    }
     @Override
     public int compareTo(Energy e) {
         return Integer.compare(this.value, e.value);

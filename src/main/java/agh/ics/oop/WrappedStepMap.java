@@ -4,16 +4,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class WrappedStepMap extends StepMap{
-    public WrappedStepMap(Integer width, Integer height, Integer startEnergy, Integer moveEnergy, Integer plantEnergy, Integer jungleRatio) {
+    public WrappedStepMap(Integer width, Integer height,  Integer jungleRatio) {
         super(width, height, jungleRatio);
     }
 
     @Override
     public boolean canMoveTo(Vector2d position) {
-        if(!super.canMoveTo(position) && !isInMap(position)){
-            return true;
-        }
-        return super.canMoveTo(position);
+        return true;
     }
 
     @Override
@@ -24,7 +21,6 @@ public class WrappedStepMap extends StepMap{
         }
         if(objectAt(vec) instanceof Grass) {
             grasses.remove(vec);
-            animal.getEnergy().addPlantEnergy();
         }
 
         animals.putIfAbsent(newPosition, new LinkedList<>());
