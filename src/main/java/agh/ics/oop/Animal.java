@@ -1,6 +1,7 @@
 package agh.ics.oop;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Animal implements IMapElement, Comparable<Animal>{
@@ -12,6 +13,7 @@ public class Animal implements IMapElement, Comparable<Animal>{
     private final Genome genome;
     private int lifetime;
     private int children;
+    private final List<Animal> childrens = new LinkedList<>();
 
     public Animal(AbstractWorldMap map, Vector2d initialPosition){
         this.orientation = MapDirection.NORTH;
@@ -141,8 +143,22 @@ public class Animal implements IMapElement, Comparable<Animal>{
     public void incrementChildren(){
         this.children++;
     }
+    public void addChild(Animal child){
+        childrens.add(child);
+    }
 
     public int getChildren() {
         return children;
+    }
+
+    public int countChildrenProgeny(List<Animal> visited){
+        int counter = children;
+        for (Animal child : childrens) {
+            if(!visited.contains(child)){
+                visited.add(child);
+                counter += child.countChildrenProgeny(visited);
+            }
+        }
+        return counter;
     }
 }

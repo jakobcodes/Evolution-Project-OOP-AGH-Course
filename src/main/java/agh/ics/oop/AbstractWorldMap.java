@@ -6,6 +6,16 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     protected Map<Vector2d, List<Animal>> animals = new LinkedHashMap<>();
     protected List<Animal> deadAnimals = new LinkedList<>();
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
+    }
+
+    private boolean isRunning;
+
     public boolean canMoveTo(Vector2d position) {
         return !isOccupied(position);
     }

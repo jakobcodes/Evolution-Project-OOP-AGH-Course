@@ -49,8 +49,8 @@ public class Chart implements IDayFinishedObserver {
 
     @Override
     public void dayFinished() {
-        daysCounter++;
         update();
+        daysCounter++;
     }
 
     private void update() {

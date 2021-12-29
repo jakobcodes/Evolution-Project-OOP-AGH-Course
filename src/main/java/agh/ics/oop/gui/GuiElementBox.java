@@ -29,6 +29,7 @@ public class GuiElementBox {
 //            else label = new Label("Trawa");
             this.vBox = new VBox(imageView);
             this.vBox.setAlignment(Pos.CENTER);
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

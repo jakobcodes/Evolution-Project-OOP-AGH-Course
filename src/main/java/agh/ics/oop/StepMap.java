@@ -155,9 +155,12 @@ public class StepMap extends AbstractWorldMap{
                 firstParent = animalsOnPos.get(0);
                 secondParent = animalsOnPos.get(1);
                 if(EnergyCalculator.canBreed(firstParent.getEnergy()) &&  EnergyCalculator.canBreed(secondParent.getEnergy())){
-                    place(firstParent.breed(secondParent));
+                    Animal child = firstParent.breed(secondParent);
+                    place(child);
                     firstParent.incrementChildren();
                     secondParent.incrementChildren();
+                    firstParent.addChild(child);
+                    secondParent.addChild(child);
                 }
 
             }

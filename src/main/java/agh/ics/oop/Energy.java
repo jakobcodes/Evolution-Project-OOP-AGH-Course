@@ -35,4 +35,8 @@ public class Energy implements Comparable<Energy>{
     public int compareTo(Energy e) {
         return Integer.compare(this.value, e.value);
     }
+
+    public boolean isDead(){
+        return value == 0;
+    }
 }

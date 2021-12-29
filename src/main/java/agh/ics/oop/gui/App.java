@@ -4,6 +4,7 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -25,8 +26,7 @@ public class App extends Application implements IDayFinishedObserver{
     private Thread rightEngineThread;
     private final int boxSize = 30;
     private Menu menu;
-    private boolean isLeftRunning;
-    private boolean isRightRunning;
+    private AnimalInfo animalInfo;
 
     public static void main(String[] args) {
         launch(args);
@@ -79,8 +79,8 @@ public class App extends Application implements IDayFinishedObserver{
 //        THREAD
         this.leftEngineThread.start();
         this.rightEngineThread.start();
-        isLeftRunning = true;
-        isRightRunning = true;
+        this.leftMap.setRunning(true);
+        this.rightMap.setRunning(true);
 //        MAP INFO
         MapInfo leftMapInfo = new MapInfo(leftMap);
         MapInfo rightMapInfo = new MapInfo(rightMap);
@@ -103,25 +103,25 @@ public class App extends Application implements IDayFinishedObserver{
         Button leftStopButton = new Button("stop");
         Button rightStopButton = new Button("stop");
         leftStopButton.setOnAction((event -> {
-            if (isLeftRunning){
+            if (leftMap.isRunning()){
                 this.leftEngineThread.suspend();
-                isLeftRunning = false;
+                leftMap.setRunning(false);
                 leftStopButton.setText("start");
             }else{
                 this.leftEngineThread.resume();
-                isLeftRunning = true;
+                leftMap.setRunning(true);
                 leftStopButton.setText("stop");
             }
 
         }));
         rightStopButton.setOnAction((event -> {
-            if (isRightRunning){
+            if (rightMap.isRunning()){
                 this.rightEngineThread.suspend();
-                isRightRunning = false;
+                rightMap.setRunning(false);
                 rightStopButton.setText("start");
             }else{
                 this.rightEngineThread.resume();
-                isRightRunning = true;
+                rightMap.setRunning(true);
                 rightStopButton.setText("stop");
             }
 
@@ -173,8 +173,16 @@ public class App extends Application implements IDayFinishedObserver{
                 Vector2d pos = new Vector2d(x,y);
                 if (map.isOccupied(pos)){
                     IMapElement iMapElement = (IMapElement) map.objectAt(pos);
-
-                    grid.add(new GuiElementBox(iMapElement).getvBox(), x-minX+1, maxY+1-y,1,1);
+                    GuiElementBox guiElementBox = new GuiElementBox(iMapElement);
+                    if(iMapElement instanceof Animal){
+                        guiElementBox.getvBox().setOnMouseClicked((event -> {
+                            if(!map.isRunning()){
+                                animalInfo = new AnimalInfo((Animal) iMapElement);
+                                mainPane.setBottom(animalInfo.getInfo());
+                            }
+                        }));
+                    }
+                    grid.add(guiElementBox.getvBox(), x-minX+1, maxY+1-y,1,1);
                 }
             }
         }
@@ -184,6 +192,7 @@ public class App extends Application implements IDayFinishedObserver{
         Platform.runLater(() -> {
             mapUpdate(leftMapGrid, leftMap);
             mapUpdate(rightMapGrid, rightMap);
+            if(animalInfo != null)animalInfo.update();
         });
     }
     private void mapUpdate(GridPane grid, AbstractWorldMap map){
