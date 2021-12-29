@@ -226,7 +226,6 @@ public class StepMap extends AbstractWorldMap{
         }else{
             return 0;
         }
-
     }
 
     @Override
@@ -249,6 +248,19 @@ public class StepMap extends AbstractWorldMap{
         }
     }
 
+    @Override
+    public Genome countDominantGenome() {
+        HashMap<Genome,Integer> ranking = new HashMap<>();
+        for(Animal animal: getAnimalsOnMap()){
+            ranking.putIfAbsent(animal.getGenome(),1);
+            ranking.put(animal.getGenome(), ranking.get(animal.getGenome())+1);
+        }
+        for(Animal animal: deadAnimals){
+            ranking.putIfAbsent(animal.getGenome(),1);
+            ranking.put(animal.getGenome(), ranking.get(animal.getGenome())+1);
+        }
+        return Collections.max(ranking.entrySet(), Map.Entry.comparingByValue()).getKey();
+    }
 
     @Override
     public Vector2d calculateNewPosition(Vector2d newPosition) {

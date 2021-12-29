@@ -14,7 +14,7 @@ public class ThreadedSimulationEngine implements IEngine, Runnable{
 
     public ThreadedSimulationEngine(AbstractWorldMap map) {
         this.map = map;
-        this.moveDelay = 300;
+        this.moveDelay = 1000;
     }
 
     @Override

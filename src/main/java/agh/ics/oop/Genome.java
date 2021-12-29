@@ -1,6 +1,7 @@
 package agh.ics.oop;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Genome {
     private static final int GENOME_SIZE = 32;
@@ -9,6 +10,44 @@ public class Genome {
 
     public Genome() {
         this.genes = getRandomGenome();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        for (Gene gene: genes){
+            hash = 31 * hash * gene.getValue();
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)return true;
+        if (!(obj instanceof Genome)){
+            return false;
+        }
+
+        Genome g = (Genome) obj;
+
+        HashMap<Integer,Integer> hashMap1 = new HashMap<>();
+        HashMap<Integer,Integer> hashMap2 = new HashMap<>();
+        genes.forEach(gene -> {
+            hashMap1.putIfAbsent(gene.getValue(), 0);
+            hashMap1.put(gene.getValue(), hashMap1.get(gene.getValue())+1);
+        });
+        g.genes.forEach(gene -> {
+            hashMap2.putIfAbsent(gene.getValue(), 0);
+            hashMap2.put(gene.getValue(), hashMap2.get(gene.getValue())+1);
+        });
+        AtomicBoolean areEqual = new AtomicBoolean(true);
+        hashMap1.forEach((key,value) -> {
+            if(hashMap2.get(key) != null){
+                if (!(hashMap2.get(key).equals(value))) areEqual.set(false);
+            }
+
+        });
+        return areEqual.get();
     }
 
     public Genome(List<Gene> genes){
@@ -70,8 +109,8 @@ public class Genome {
 
     @Override
     public String toString() {
-        return "Genome{" +
-                "genes=" + genes +
+        return "Genome{"
+                 + genes +
                 '}';
     }
 }

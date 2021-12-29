@@ -81,13 +81,22 @@ public class App extends Application implements IDayFinishedObserver{
         this.rightEngineThread.start();
         isLeftRunning = true;
         isRightRunning = true;
+//        MAP INFO
+        MapInfo leftMapInfo = new MapInfo(leftMap);
+        MapInfo rightMapInfo = new MapInfo(rightMap);
+        leftEngine.addObserver(leftMapInfo);
+        rightEngine.addObserver(rightMapInfo);
 //        CHART
         Chart leftChart = new Chart(this.leftMap);
         Chart rightChart = new Chart(this.rightMap);
         leftEngine.addObserver(leftChart);
         rightEngine.addObserver(rightChart);
-        HBox charts = new HBox(leftChart.getLineChart(),rightChart.getLineChart());
+
+        HBox charts = new HBox(new VBox(leftChart.getLineChart(),leftMapInfo.getMapInfo()) ,new VBox(rightChart.getLineChart(), rightMapInfo.getMapInfo()));
         this.mainPane.setCenter(charts);
+
+
+
 
 
 //        STOP BUTTONS

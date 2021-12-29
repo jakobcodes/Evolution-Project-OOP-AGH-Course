@@ -77,5 +77,6 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     public abstract int countAvgLifetime();
     public abstract void incrementLifetime();
     public abstract int countAvgChildren();
+    public abstract Genome countDominantGenome();
 
 }
