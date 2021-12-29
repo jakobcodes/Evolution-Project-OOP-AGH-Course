@@ -1,5 +1,6 @@
-package agh.ics.oop;
+package agh.ics.oop.gui;
 
+import agh.ics.oop.Animal;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
