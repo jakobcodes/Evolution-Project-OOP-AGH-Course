@@ -3,5 +3,5 @@ package agh.ics.oop;
 public interface IMapElement {
     public Vector2d getPosition();
 
-    public String getPathToImage();
+    public String getPathToImage(); // dobrze by to było przenieść do GUI
 }

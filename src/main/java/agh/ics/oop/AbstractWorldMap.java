@@ -67,7 +67,7 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
     public abstract Vector2d calculateNewPosition(Vector2d newPosition);
     public abstract Vector2d getFreePos();
     protected abstract List<Animal> getAnimalsOnMap();
-    public abstract void deleteAnimals();
+    public abstract void deleteAnimals();   // deleteDeadAnimals?
     public abstract void animalsBreed();
     public abstract void moveAnimals();
     public abstract void eatGrass();
@@ -80,10 +80,10 @@ abstract public class AbstractWorldMap implements IWorldMap,IPositionChangeObser
 
 
 
-    @Override
-    public String toString() {
-        return new MapVisualizer(this).draw(getLeftBottomCorner(), getRightTopCorner());
-    }
+//    @Override
+//    public String toString() {
+//        return new MapVisualizer(this).draw(getLeftBottomCorner(), getRightTopCorner());
+//    }
 
 
 }

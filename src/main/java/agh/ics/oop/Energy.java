@@ -3,7 +3,7 @@ package agh.ics.oop;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class Energy implements Comparable<Energy>{
+public class Energy implements Comparable<Energy>{  // czy ta klasa wnosi coś, czego nie ma Integer?
     private final Integer value;
 
     public Energy(Integer value) {

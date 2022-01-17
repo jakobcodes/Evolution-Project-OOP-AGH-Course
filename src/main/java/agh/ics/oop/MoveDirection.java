@@ -1,6 +1,6 @@
 package agh.ics.oop;
 
-public enum MoveDirection {
+public enum MoveDirection { // to jeszcze gdzieś jest używane?
     FORWARD,
     BACKWARD,
     RIGHT,
